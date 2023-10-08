@@ -58,16 +58,24 @@ int main(int argc, char *argv[])
     //…
     // ler mensagem do FIFO
     char comando[100];
+    int input;
+    char carroIn[50];
+    char carroOut[50];
 
-    criarFifo("Carro.in");
-    criarFifo("Carro.out");
+    printf("Qual o numero do carro?\n");
+    scanf("%i", &input);
+    sprintf(carroIn, "CARRO%i.in", input);
+    sprintf(carroOut, "CARRO%i.out", input);
+
+    criarFifo(carroIn);
+    criarFifo(carroOut);
     if (argc >= 2)
     {
         sprintf (comando, "/bin/bash ./testscript.sh %s &", argv[1]);
         system(comando);
     }
-    escrever("Carro.out", "");
-    ler("Carro.in");
+    escrever(carroOut, "");
+    ler(carroIn);
 
 }
 
