@@ -4,7 +4,7 @@
 #include<stdlib.h>
 #include<fcntl.h>
 #include<sys/stat.h>
-#define BUFFER_SIZE 20
+#define BUFFER_SIZE 42
 #define FIFO_PATH "fifo1"
 
 void criarFifo(char *str)
@@ -15,15 +15,30 @@ void criarFifo(char *str)
         printf("FIFO %s criado com sucesso\n", str);
 }
 
-void ler(char *nameFile, char *buffer)
+int roud10(char *str)
+{
+    int i = 0;
+    while (str[i])
+        i ++;
+    if (i < 7)
+        return 1;
+    
+    return str[6] == '1' && str[7] == '0'? 0 : 1;
+}
+void ler(char *nameFile)
 {
     int size;
     int fd;
+    char buffer[BUFFER_SIZE];
+
     fd = open(nameFile, O_RDONLY);
-    while((size = read(fd, buffer, sizeof(buffer)))> 0)
+    do
     {
+        size = read(fd, buffer, BUFFER_SIZE - 1);
+        buffer[40] = '\0';
+        buffer[41] = '\n';
         write(STDIN_FILENO, buffer, size);
-    }
+    }while (roud10(buffer));
     close(fd);
 }
 
@@ -35,6 +50,7 @@ void escrever(char *nameFile, char *msg)
     close(fd);
 }
 
+
 int main(int argc, char *argv[])
 {
     setvbuf(stdout, NULL, _IONBF, 0);
@@ -42,7 +58,6 @@ int main(int argc, char *argv[])
     //…
     // ler mensagem do FIFO
     char comando[100];
-    char buffer[BUFFER_SIZE];
 
     criarFifo("Carro.in");
     criarFifo("Carro.out");
@@ -52,7 +67,7 @@ int main(int argc, char *argv[])
         system(comando);
     }
     escrever("Carro.out", "");
-    ler("Carro.in", buffer);
+    ler("Carro.in");
 
 }
 
